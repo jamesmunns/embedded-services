@@ -358,8 +358,8 @@ mod test {
     fn test_node_internal_validity() {
         // test if invalid node will block data access
         // NOTE: this can't be accessed outside of this crate, due to private wrapping of Node::inner.
-        static EMPTY_NODE: OnceLock<RegistrationOnlyOneInstance> = OnceLock::new();
-        let empty_node = EMPTY_NODE.get_or_init(|| RegistrationOnlyOneInstance {});
+        static EMPTY_NODE: RegistrationOnlyOneInstance = RegistrationOnlyOneInstance { };
+        let empty_node = &EMPTY_NODE;
 
         // accessing private .inner. here just for test validation. Not a consumer facing scenario
         // SAFETY: this is not safe. Don't do this. Only here for test completeness
@@ -384,8 +384,8 @@ mod test {
         assert!(list.push(second_el).is_err());
 
         // guard against invalid node insertion
-        static SIMPLE_NODE: OnceLock<RegistrationOnly> = OnceLock::new();
-        let simple_node = SIMPLE_NODE.get_or_init(|| RegistrationOnly { node: Node::uninit() });
+        static SIMPLE_NODE: RegistrationOnly = RegistrationOnly { node: Node::uninit() };
+        let simple_node = &SIMPLE_NODE;
         assert!(list.push(simple_node).is_ok());
 
         // try pushing to a second list
@@ -393,11 +393,11 @@ mod test {
         assert!(list2.push(simple_node).is_err());
 
         // ensure that someone can't abuse the get_node() trait to allow list mangling:
-        static EMPTY_NODE: OnceLock<RegistrationOnlyOneInstance> = OnceLock::new();
-        let empty_node = EMPTY_NODE.get_or_init(|| RegistrationOnlyOneInstance {});
+        static EMPTY_NODE: RegistrationOnlyOneInstance = RegistrationOnlyOneInstance {};
+        let empty_node = &EMPTY_NODE;
 
-        static EMPTY_NODE_UNPUSHABLE: OnceLock<RegistrationOnlyOneInstance> = OnceLock::new();
-        let empty_node_unpushable = EMPTY_NODE_UNPUSHABLE.get_or_init(|| RegistrationOnlyOneInstance {});
+        static EMPTY_NODE_UNPUSHABLE: RegistrationOnlyOneInstance = RegistrationOnlyOneInstance {};
+        let empty_node_unpushable = &EMPTY_NODE_UNPUSHABLE;
         // place the single iterable instance in first list
         assert!(list.push(empty_node).is_ok());
 
