@@ -23,14 +23,14 @@ pub(super) struct State {
 
 impl<'a> Service<'a> {
     /// PPM reset implementation
-    async fn process_ppm_reset(&self, state: &mut State) {
+    fn process_ppm_reset(&self, state: &mut State) {
         debug!("Resetting PPM");
         state.notifications_enabled = NotificationEnable::default();
         state.pending_ports.clear();
     }
 
     /// Set notification enable implementation
-    async fn process_set_notification_enable(&self, state: &mut State, enable: NotificationEnable) {
+    fn process_set_notification_enable(&self, state: &mut State, enable: NotificationEnable) {
         debug!("Set Notification Enable: {:?}", enable);
         state.notifications_enabled = enable;
     }
@@ -50,8 +50,7 @@ impl<'a> Service<'a> {
     ) -> Result<Option<ppm::ResponseData>, PdError> {
         match command {
             ppm::Command::SetNotificationEnable(enable) => {
-                self.process_set_notification_enable(state, enable.notification_enable)
-                    .await;
+                self.process_set_notification_enable(state, enable.notification_enable);
                 Ok(None)
             }
             ppm::Command::GetCapability => Ok(Some(self.process_get_capabilities().await)),
@@ -187,7 +186,7 @@ impl<'a> Service<'a> {
                     PpmOutput::ResetComplete => {
                         // Resets don't follow the normal command execution flow
                         // So do any reset processing here
-                        self.process_ppm_reset(state).await;
+                        self.process_ppm_reset(state);
                         // Don't notify OPM because it'll poll
                         response.notify_opm = false;
                         response.cci = Cci::new_reset_complete();

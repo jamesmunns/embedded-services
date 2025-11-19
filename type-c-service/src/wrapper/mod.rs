@@ -259,8 +259,7 @@ where
             local_port_id,
             status_event.new_power_contract_as_consumer(),
             status_event.sink_ready(),
-        )
-        .await?;
+        )?;
 
         Ok(Output::PortStatusChanged(OutputPortStatusChanged {
             port: local_port_id,
