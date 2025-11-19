@@ -596,7 +596,7 @@ where
     /// Register all devices with their respective services
     pub async fn register(&'static self) -> Result<(), Error<<C::Inner as Controller>::BusError>> {
         for device in self.registration.power_devices {
-            policy::register_device(device).await.map_err(|_| {
+            policy::register_device(device).map_err(|_| {
                 error!(
                     "Controller{}: Failed to register power device {}",
                     self.registration.pd_controller.id().0,
